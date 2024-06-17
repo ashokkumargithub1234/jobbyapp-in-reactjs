@@ -2,7 +2,7 @@ import {Component} from 'react'
 import Cookies from 'js-cookie'
 
 import './index.css'
-
+/*
 class Login extends Component {
   state = {
     username: '',
@@ -76,6 +76,92 @@ class Login extends Component {
               placeholder="Password"
               type="password"
               onChange={this.passwordField}
+            />
+          </div>
+          <button type="submit" className="login-button">
+            Login
+          </button>
+          {showErrorMessage && <p className="error-message">*{errorMessage}</p>}
+        </form>
+      </div>
+    )
+  }
+}
+*/
+
+class Login extends Component {
+  state = {
+    username: '',
+    password: '',
+    showErrorMessage: false,
+  }
+
+  usernameField = event => {
+    this.setState({username: event.target.value})
+  }
+
+  passwordField = event => {
+    this.setState({password: event.target.value})
+  }
+
+  onSuccessView = data => {
+    Cookies.set('jwt_token', data.jwt_token, {expires: 30})
+    const {history} = this.props
+    history.replace('/')
+  }
+
+  onSubmitForm = async event => {
+    event.preventDefault()
+    const {username, password} = this.state
+    const userDetails = {username, password}
+    const url = 'https://apis.ccbp.in/login'
+    const options = {
+      method: 'POST',
+      body: JSON.stringify(userDetails),
+    }
+    const response = await fetch(url, options)
+    const data = await response.json()
+    console.log(data.error_msg)
+    if (response.ok === true) {
+      this.onSuccessView(data)
+    } else {
+      this.setState({showErrorMessage: true, errorMessage: data.error_msg})
+    }
+  }
+
+  render() {
+    const {username, password, showErrorMessage, errorMessage} = this.state
+    console.log(errorMessage)
+    return (
+      <div className="login-container">
+        <form className="form-container" onSubmit={this.onSubmitForm}>
+          <img
+            src="https://assets.ccbp.in/frontend/react-js/logo-img.png"
+            alt="website logo"
+            className="login-website-logo"
+          />
+          <div className="input-container">
+            <label className="input-label" htmlFor="username">
+              USERNAME
+            </label>
+            <input
+              type="text"
+              value={username}
+              id="username"
+              onChange={this.usernameField}
+              className="username-input-field"
+            />
+          </div>
+          <div className="input-container">
+            <label className="input-label" htmlFor="password">
+              PASSWORD
+            </label>
+            <input
+              type="password"
+              value={password}
+              id="password"
+              onChange={this.passwordField}
+              className="password-input-field"
             />
           </div>
           <button type="submit" className="login-button">
